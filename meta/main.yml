@@ -1,0 +1,9 @@
+galaxy_info:
+  role_name: moc_firewall
+  namespace: massopencloud
+  author: MOC Ops Staff
+  license: GPL-2.0-or-later
+  min_ansible_version: 2.9
+
+dependencies:
+  - moc_base

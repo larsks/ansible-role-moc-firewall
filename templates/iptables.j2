@@ -1,0 +1,73 @@
+# This file is managed by Ansible.
+
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:moc_control_hosts - [0:0]
+:moc_input - [0:0]
+:moc_forward - [0:0]
+:moc_output - [0:0]
+
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -j moc_control_hosts
+-A INPUT -j moc_input
+
+{% if fw_log_rejects %}
+# Prevent firewall logging from impacting system performance. This limits
+# logs to a max rate of 1 log message per second.
+-A INPUT -m limit --limit 1/s --limit-burst 10 -j LOG --log-prefix "filter_INPUT "
+{% endif %}
+-A INPUT -j REJECT --reject-with icmp-admin-prohibited
+
+# Always allow connections from our control hosts.
+{% for host in moc_control_hosts %}
+-A moc_control_hosts -s {{ host }} -j ACCEPT
+{% endfor %}
+
+{% for svcname in fw_enabled_services|default([]) %}
+{% set service = fw_services[svcname] %}
+##
+## {{ svcname }} INPUT
+##
+{% for rule in service.filter_INPUT|default([]) %}
+-A moc_input -p {{ rule.proto|default('tcp') }} {# -#}
+{% if rule.srcip is defined %}-s {{ rule.srcip }}{% endif %} {# -#}
+{% if rule.dstip is defined %}-d {{ rule.dstip }}{% endif %} {# -#}
+{% if rule.dport is defined %}--dport {{ rule.dport }}{% endif %} {# -#}
+{% if rule.sport is defined %}--sport {{ rule.sport }}{% endif %} {# -#}
+{% if not rule.anystate|default(false) %}-m state --state NEW{% endif %} {# -#}
+-m comment {# -#}
+--comment "{% if rule.comment is defined %}{{ rule.comment }}{% else %}{{ svcname }}{% endif %}"
+{% endfor %}
+
+{% for rule in service.filter_INPUT_raw|default([]) %}
+-A moc_input {{ rule }} -m comment --comment "{{ svcname }}"
+{% endfor %}
+
+{% endfor %}
+
+-A FORWARD -j moc_forward
+
+-A OUTPUT -j moc_output
+
+
+COMMIT
+
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:moc_prerouting - [0:0]
+:moc_postrouting - [0:0]
+:moc_output - [0:0]
+:moc_input - [0:0]
+
+-A PREROUTING -j moc_prerouting
+-A POSTROUTING -j moc_postrouting
+-A OUTPUT -j moc_output
+-A INPUT -j moc_input
+COMMIT
