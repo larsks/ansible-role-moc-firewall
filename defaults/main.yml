@@ -1,0 +1,8 @@
+---
+iptables_path: /etc/sysconfig/iptables
+iptables_packages:
+  - iptables
+  - iptables-services
+
+fw_log_rejects: false
+fw_reload_mode: flag

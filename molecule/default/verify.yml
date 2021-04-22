@@ -1,0 +1,44 @@
+- name: Verify
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+  - name: check that /etc/sysconfig/iptables exists
+    stat:
+      path: /etc/sysconfig/iptables
+    register: config_check
+
+  - name: assert that /etc/sysconfig/iptables exists
+    assert:
+      that: config_check.stat.exists
+
+  - name: read iptables content
+    command: cat /etc/sysconfig/iptables
+    register: config
+
+  - name: check for custom chains
+    assert:
+      that: item in config.stdout_lines
+      quiet: true
+    loop:
+      - ":moc_control_hosts - [0:0]"
+      - ":moc_input - [0:0]"
+      - ":moc_forward - [0:0]"
+      - ":moc_output - [0:0]"
+
+  - name: check for control host
+    assert:
+      that: >-
+        "-A moc_control_hosts -s 127.0.0.100 -j ACCEPT"
+        in config.stdout_lines
+
+  - name: check for moc_ssh rules
+    assert:
+      that: item in config.stdout_lines
+      quiet: true
+    loop:
+      - >-
+        -A moc_input -p tcp -s 129.10.5.0/24  --dport 22  -m state --state NEW -m comment --comment "ssh_moc"
+      - >-
+        -A moc_input -p tcp -s 192.12.185.0/24  --dport 22  -m state --state NEW -m comment --comment "ssh_moc"
+

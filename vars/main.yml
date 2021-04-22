@@ -1,0 +1,46 @@
+fw_services:
+  ssh_virt:
+    filter_INPUT:
+      - srcip: 192.168.122.1
+        dport: 22
+  ssh_global:
+    filter_INPUT:
+      - dport: 22
+  ssh_moc:
+    filter_INPUT:
+      - srcip: 129.10.5.0/24
+        dport: 22
+      - srcip: 192.12.185.0/24
+        dport: 22
+  ssh_ratelimit:
+    filter_INPUT_raw:
+      - >-
+        -p tcp --dport 22
+        -m state --state NEW
+        -m recent --name SSH --update --seconds 60 --hitcount 8
+        -j DROP
+      - >-
+        -p tcp --dport 22
+        -m state --state NEW
+        -m recent --name SSH --set
+        -j ACCEPT
+  smtp:
+    filter_INPUT:
+      - dport: 25
+      - dport: 465
+  imap:
+    filter_INPUT:
+      - dport: 993
+  web:
+    filter_INPUT:
+      - dport: 80
+      - dport: 443
+  domain:
+    filter_INPUT:
+      - proto: tcp
+        dport: 53
+      - proto: udp
+        dport: 53
+  zabbix:
+    filter_INPUT:
+      - dport: 10050

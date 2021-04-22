@@ -1,0 +1,5 @@
+roles:
+  - name: moc_base
+    scm: git
+    src: git+https://github.com/larsks/ansible-role-moc-base
+    version: master

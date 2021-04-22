@@ -1,0 +1,35 @@
+---
+- name: install packages
+  become: true
+  tags: [package]
+  package:
+    name: "{{ iptables_packages }}"
+    state: installed
+
+- name: disable firewalld
+  become: true
+  tags: [service]
+  failed_when: false
+  service:
+    name: firewalld
+    state: stopped
+    enabled: false
+
+- name: enable iptables service
+  become: true
+  tags: [notest,service]
+  service:
+    name: iptables
+    enabled: true
+
+- name: create iptables
+  become: true
+  tags: [config]
+  template:
+    src: iptables.j2
+    dest: "{{ iptables_path }}"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+  notify:
+    - reload iptables

@@ -1,0 +1,34 @@
+- name: syntax check firewall rules
+  become: true
+  listen:
+    - reload iptables
+  command: >-
+    /usr/sbin/iptables-restore --test {{ iptables_path }}
+
+- name: reload running firewall
+  become: true
+  when: >-
+    fw_reload_mode == "live"
+  listen:
+    - reload iptables
+  command: iptables-restore /etc/sysconfig/iptables
+
+- name: flag reboot
+  become: true
+  when: >-
+    fw_reload_mode == "flag"
+  listen:
+    - reload iptables
+  lineinfile:
+    path: /run/moc/needs_reboot
+    line: firewall
+    create: true
+    mode: "0644"
+
+- name: reboot server
+  become: true
+  when:
+    fw_reload_mode == "reboot"
+  listen:
+    - reload iptables
+  reboot:
