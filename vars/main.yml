@@ -12,6 +12,12 @@ fw_services:
         dport: 22
       - srcip: 192.12.185.0/24
         dport: 22
+  all_internal_nets:
+    filter_INPUT:
+      - srcip: 10.0.0.0/8
+      - srcip: 172.16.0.0/12
+      - srcip: 192.168.0.0/16
+
   ssh_ratelimit:
     filter_INPUT_raw:
       - >-
