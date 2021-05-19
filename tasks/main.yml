@@ -1,4 +1,10 @@
 ---
+- name: disable legacy firewall script
+  lineinfile:
+    path: /etc/rc.local
+    line: /etc/scripts/firewall
+    state: absent
+
 - name: install packages
   become: true
   tags: [package]
