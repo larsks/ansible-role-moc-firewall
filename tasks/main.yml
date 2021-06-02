@@ -27,6 +27,7 @@
   service:
     name: iptables
     enabled: true
+    state: started
 
 - name: create iptables
   become: true
