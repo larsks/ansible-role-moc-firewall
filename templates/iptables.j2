@@ -40,7 +40,8 @@
 {% if rule.sport is defined %}--sport {{ rule.sport }}{% endif %} {# -#}
 {% if not rule.anystate|default(false) %}-m state --state NEW{% endif %} {# -#}
 -m comment {# -#}
---comment "{% if rule.comment is defined %}{{ rule.comment }}{% else %}{{ svcname }}{% endif %}"
+--comment "{% if rule.comment is defined %}{{ rule.comment }}{% else %}{{ svcname }}{% endif %}" {# -#}
+-j ACCEPT
 {% endfor %}
 
 {% for rule in service.filter_INPUT_raw|default([]) %}
