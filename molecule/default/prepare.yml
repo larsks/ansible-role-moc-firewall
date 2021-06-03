@@ -42,3 +42,11 @@
 
           */5 * * * * root /root/checkdb
           */5 * * * * root docker ps|grep massopen &>/dev/null || /etc/scripts/firewall
+
+    - name: create fake blockipupd script
+      copy:
+        dest: /etc/cron.daily/blockipupd
+        content: |
+          #!/bin/sh
+
+          echo this is a test
