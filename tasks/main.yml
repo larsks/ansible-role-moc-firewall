@@ -1,8 +1,25 @@
 ---
 - name: disable legacy firewall script
+  tags: [legacy]
+  become: true
   lineinfile:
     path: /etc/rc.local
     line: /etc/scripts/firewall
+    state: absent
+
+- name: disable legacy blockipupd script
+  tags: [legacy]
+  become: true
+  file:
+    path: /etc/cron.daily/blockipupd
+    state: absent
+
+- name: disable firewall changes from crontab
+  tags: [legacy]
+  become: true
+  lineinfile:
+    path: /etc/crontab
+    regexp: /etc/scripts/firewall
     state: absent
 
 - name: install packages
@@ -23,7 +40,7 @@
 
 - name: enable iptables service
   become: true
-  tags: [notest,service]
+  tags: [notest, service]
   service:
     name: iptables
     enabled: true

@@ -38,7 +38,24 @@
       quiet: true
     loop:
       - >-
-        -A moc_input -p tcp -s 129.10.5.0/24  --dport 22  -m state --state NEW -m comment --comment "ssh_moc"
+        -A moc_input -p tcp -s 129.10.5.0/24  --dport 22  -m state --state NEW -m comment --comment "ssh_moc" -j ACCEPT
       - >-
-        -A moc_input -p tcp -s 192.12.185.0/24  --dport 22  -m state --state NEW -m comment --comment "ssh_moc"
+        -A moc_input -p tcp -s 192.12.185.0/24  --dport 22  -m state --state NEW -m comment --comment "ssh_moc" -j ACCEPT
 
+  - name: get content of /etc/crontab
+    command: cat /etc/crontab
+    register: crontab
+
+  - name: check contents of crontab
+    assert:
+      that: >-
+        "/etc/scripts/firewall" not in crontab.stdout
+
+  - name: check for blockipupd cronjob
+    stat:
+      path: /etc/cron.daily/blockipupd
+    register: blockipupd
+
+  - name: verify that blockipupd cronjob is absent
+    assert:
+      that: not blockipupd.stat.exists
