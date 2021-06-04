@@ -24,7 +24,9 @@ provisioner:
         moc_control_hosts:
           - 127.0.0.100
         fw_enabled_services:
+          - web
           - ssh_moc
+          - mysql_local
 verifier:
   name: ansible
 lint: |
