@@ -13,6 +13,14 @@
     - reload iptables
   command: iptables-restore /etc/sysconfig/iptables
 
+- name: "reload running firewall: post"
+  become: true
+  when: >-
+    fw_reload_mode == "live" and fw_reload_post is defined
+  listen:
+    - reload iptables
+  command: "{{ fw_reload_post }}"
+
 - name: flag reboot
   become: true
   when: >-
