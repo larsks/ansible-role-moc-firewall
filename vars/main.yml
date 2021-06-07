@@ -12,6 +12,8 @@ fw_services:
         dport: 22
       - srcip: 192.12.185.0/24
         dport: 22
+      - srcip: 128.31.28.0/24
+        dport: 22
   all_internal_nets:
     filter_INPUT:
       - srcip: 10.0.0.0/8
@@ -50,3 +52,12 @@ fw_services:
   zabbix:
     filter_INPUT:
       - dport: 10050
+
+  # For hosts running containerized services, but MySQL on the host, we need
+  # to permit connections from "everywhere that is not the primary interface"
+  # (because we don't know in advance the source ip or even the cidr range of
+  # the containerized services).
+  mysql_local:
+    filter_INPUT_raw:
+      - >-
+        -p tcp --dport 3306 ! -i {{ fw_primary_interface }} -j ACCEPT

@@ -6,3 +6,4 @@ iptables_packages:
 
 fw_log_rejects: false
 fw_reload_mode: flag
+fw_primary_interface: eth0
