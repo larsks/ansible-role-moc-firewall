@@ -52,6 +52,11 @@ fw_services:
   zabbix:
     filter_INPUT:
       - dport: 10050
+  all_from_sso:
+    filter_INPUT:
+      - srcip: 128.31.28.11
+      - srcip: 128.31.28.12
+      - srcip: 128.31.28.13
 
   # For hosts running containerized services, but MySQL on the host, we need
   # to permit connections from "everywhere that is not the primary interface"
