@@ -33,7 +33,9 @@
 ## {{ svcname }} INPUT
 ##
 {% for rule in service.filter_INPUT|default([]) %}
--A moc_input -p {{ rule.proto|default('tcp') }} {# -#}
+{% set proto = rule.proto|default('tcp') %}
+-A moc_input {# -#}
+{% if proto != "all" %}-p {{ proto }}{% endif %} {# -#}
 {% if rule.srcip is defined %}-s {{ rule.srcip }}{% endif %} {# -#}
 {% if rule.dstip is defined %}-d {{ rule.dstip }}{% endif %} {# -#}
 {% if rule.dport is defined %}--dport {{ rule.dport }}{% endif %} {# -#}

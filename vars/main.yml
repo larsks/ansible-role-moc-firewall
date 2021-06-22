@@ -55,8 +55,11 @@ fw_services:
   all_from_sso:
     filter_INPUT:
       - srcip: 128.31.28.11
+        proto: all
       - srcip: 128.31.28.12
+        proto: all
       - srcip: 128.31.28.13
+        proto: all
 
   # For hosts running containerized services, but MySQL on the host, we need
   # to permit connections from "everywhere that is not the primary interface"
